@@ -9,7 +9,7 @@ interface MathExamProps {
 export const MathExam: React.FC<MathExamProps> = ({ onBack }) => {
   const [selectedAnswer, setSelectedAnswer] = useState<string>('');
   const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [timeLeft, setTimeLeft] = useState(1800); // 30 minutes in seconds
+  const [timeLeft, setTimeLeft] = useState(1500); // 25 minutes in seconds
   
   const questions = [
     {

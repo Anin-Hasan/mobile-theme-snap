@@ -31,7 +31,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, currentPage, 
   return (
     <>
       {/* Mobile: Dropdown below header */}
-      <div className="w-full bg-background border-b shadow-sm md:hidden">
+      <div className="lg:hidden w-full bg-background border-b shadow-sm">
         <nav className="p-4 space-y-2">
           {menuItems.map((item) => (
             <button
@@ -51,7 +51,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, currentPage, 
       </div>
 
       {/* Desktop: Slide from side */}
-      <div className="hidden md:block">
+      <div className="hidden lg:block">
         {/* Overlay */}
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40"

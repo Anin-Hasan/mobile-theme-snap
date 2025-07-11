@@ -69,7 +69,7 @@ export const ExamSelection: React.FC<ExamSelectionProps> = ({ onBack, onSelectEx
         </div>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
             <div className="flex items-center space-x-2">
               <Users className="w-5 h-5 text-blue-600" />
@@ -91,7 +91,7 @@ export const ExamSelection: React.FC<ExamSelectionProps> = ({ onBack, onSelectEx
         </div>
 
         {/* Exam Types */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           {examTypes.map((exam) => (
             <div key={exam.id} className="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-start space-x-4">
