@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -50,7 +49,7 @@ const Index = () => {
   };
 
   const handleMenuClick = () => {
-    setSidebarOpen(true);
+    setSidebarOpen(!sidebarOpen);
   };
 
   const renderCurrentPage = () => {
@@ -73,8 +72,16 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <div className="flex h-screen overflow-hidden">
-        {/* Sidebar */}
+      <div className="flex flex-col h-screen">
+        {/* Header */}
+        <Header 
+          onMenuClick={handleMenuClick}
+          isDark={isDark}
+          onThemeToggle={toggleTheme}
+          user={mockUser}
+        />
+
+        {/* Sidebar - appears below header when open */}
         <Sidebar 
           isOpen={sidebarOpen}
           onClose={handleSidebarClose}
@@ -83,18 +90,9 @@ const Index = () => {
         />
 
         {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <Header 
-            onMenuClick={handleMenuClick}
-            isDark={isDark}
-            onThemeToggle={toggleTheme}
-            user={mockUser}
-          />
-          
-          <main className="flex-1 overflow-auto">
-            {renderCurrentPage()}
-          </main>
-        </div>
+        <main className="flex-1 overflow-auto">
+          {renderCurrentPage()}
+        </main>
       </div>
 
       {/* Quick Action Button */}
