@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Sidebar } from '../components/Sidebar';
 import { Header } from '../components/Header';
@@ -5,12 +6,15 @@ import { Dashboard } from '../components/Dashboard';
 import { Quiz } from '../components/Quiz';
 import { Profile } from '../components/Profile';
 import { Login } from '../components/Login';
+import { ExamSelection } from '../components/ExamSelection';
+import { MathExam } from '../components/MathExam';
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [selectedExamType, setSelectedExamType] = useState<string>('');
 
   const mockUser = {
     name: 'Rakib Hassan',
@@ -52,11 +56,19 @@ const Index = () => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  const handleExamSelect = (examType: string) => {
+    setSelectedExamType(examType);
+    setCurrentPage(`${examType}-exam`);
+  };
+
   const renderCurrentPage = () => {
     switch (currentPage) {
       case 'dashboard':
         return <Dashboard onNavigate={handleNavigate} />;
       case 'exam':
+        return <ExamSelection onBack={() => setCurrentPage('dashboard')} onSelectExam={handleExamSelect} />;
+      case 'math-exam':
+        return <MathExam onBack={() => setCurrentPage('exam')} />;
       case 'quiz':
         return <Quiz onBack={() => setCurrentPage('dashboard')} />;
       case 'profile':
