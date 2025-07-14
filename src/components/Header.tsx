@@ -16,7 +16,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, isDark, onThemeTogg
   return (
     <header className="bg-background border-b px-4 py-3 flex items-center justify-between sticky top-0 z-30">
       <div className="flex items-center space-x-3">
-        <button onClick={onMenuClick} className="md:hidden">
+        <button onClick={onMenuClick}>
           <Menu className="w-6 h-6" />
         </button>
         
