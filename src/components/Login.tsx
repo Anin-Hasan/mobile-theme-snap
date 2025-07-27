@@ -28,7 +28,7 @@ export const Login: React.FC<LoginProps> = ({ onLogin }) => {
         {/* Logo */}
         <div className="text-center">
           <div className="w-16 h-16 bg-orange-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">চট</span>
+            <span className="text-white font-bold text-2xl">শীর্ষ</span>
           </div>
           <h1 className="text-white text-lg">রেজিস্টার/লগ ইন</h1>
         </div>

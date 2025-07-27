@@ -8,8 +8,8 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({ onNavigate }) => {
   const features = [
-    { id: 'bank', title: 'ব্যাংক', icon: '🏦', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' },
-    { id: 'brand-promotion', title: 'ব্র্যান্ড প্রমোশন', icon: '⚡', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
+    { id: 'bank', title: 'প্রশ্ন ব্যাংক', icon: '🏦', color: 'bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300' },
+    { id: 'brand-promotion', title: 'মক পরীক্ষা', icon: '⚡', color: 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' },
     { id: 'book-review', title: 'বই পর্যালোচনা', icon: '📖', color: 'bg-pink-100 text-pink-700 dark:bg-pink-900 dark:text-pink-300' },
     { id: 'routine', title: 'রুটিন', icon: '📅', color: 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' },
     { id: 'chatbot', title: 'চ্যাটবট', icon: '💬', color: 'bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300' },

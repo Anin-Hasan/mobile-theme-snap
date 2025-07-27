@@ -64,9 +64,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, currentPage, 
           <div className="flex items-center justify-between p-4 border-b">
             <div className="flex items-center space-x-2">
               <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">চট</span>
+                <span className="text-white font-bold text-lg">শীর্ষ</span>
               </div>
-              <span className="font-semibold text-lg">চট</span>
+              <span className="font-semibold text-lg">শীর্ষ</span>
             </div>
             <button onClick={onClose}>
               <X className="w-6 h-6" />

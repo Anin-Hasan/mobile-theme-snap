@@ -22,9 +22,9 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, isDark, onThemeTogg
         
         <div className="flex items-center space-x-2">
           <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-lg">চট</span>
+            <span className="text-white font-bold text-lg">শীর্ষ</span>
           </div>
-          <span className="font-semibold text-lg hidden sm:block">চট</span>
+          <span className="font-semibold text-lg hidden sm:block">শীর্ষ</span>
         </div>
       </div>
 
