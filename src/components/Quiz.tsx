@@ -1,118 +1,136 @@
-
-import React, { useState } from 'react';
-import { ArrowLeft, Clock, CheckCircle2 } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Clock } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
+import * as api from '@/api/user';
+import { MathRenderer } from './MathRenderer'; // <-- Import the new component
 
 interface QuizProps {
+  questions: api.Question[];
+  options: api.ExamSetupOptions;
+  onSubmit: (result: api.ExamResult) => void;
   onBack: () => void;
 }
 
-export const Quiz: React.FC<QuizProps> = ({ onBack }) => {
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('');
-  const [currentQuestion, setCurrentQuestion] = useState(1);
-  const [timeLeft, setTimeLeft] = useState(25);
+export const Quiz: React.FC<QuizProps> = ({ questions, options, onSubmit, onBack }) => {
+  const [answers, setAnswers] = useState<Record<string, number | null>>({});
+  const [timeLeft, setTimeLeft] = useState(options.timeLimitMinutes * 60);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAlertOpen, setIsAlertOpen] = useState(false);
   
-  const question = {
-    text: 'কেন কিভাবে পরীক্ষা দিতে চাও?',
-    options: [
-      '১ম বর্ষ',
-      'কোইভাবে এর পরীক্ষা',
-      'ফ্রি',
-      'পরীক্ষা',
-      'নিয়মিত পরীক্ষা দিবো',
-      'জাতি, ধর্ম, ও অঞ্চল',
-      'আমার এর পরীক্ষা',
-      'পড়ালেখা সহ্যায়ক বই',
-      'পড়ালেখা শহীদ',
-      'পরীক্ষা',
-      'আমার গেট ও গার্লস পরীক্ষা',
-      '২য় বর্ষ',
-      'প্রকল্প বিতরণ'
-    ]
-  };
+  const timerRef = useRef<NodeJS.Timeout>();
 
-  React.useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft(prev => prev > 0 ? prev - 1 : 0);
+  useEffect(() => {
+    if (timeLeft === 0) {
+      handleSubmit();
+    }
+  }, [timeLeft]);
+
+  useEffect(() => {
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-    return () => clearInterval(timer);
+    
+    return () => clearInterval(timerRef.current!);
   }, []);
 
-  const handleSubmit = () => {
-    // Handle answer submission
-    console.log('Selected answer:', selectedAnswer);
+  const handleAnswerChange = (questionId: string, optionIndex: number) => {
+    setAnswers(prev => ({ ...prev, [questionId]: optionIndex }));
+  };
+  
+  const handleSubmit = async () => {
+    clearInterval(timerRef.current!);
+    setIsSubmitting(true);
+    const userAnswers: api.UserAnswer[] = questions.map(q => ({
+      questionId: q._id,
+      selectedOptionIndex: answers[q._id] ?? null,
+    }));
+    
+    try {
+      const result = await api.submitMockExam(questions, userAnswers, options);
+      onSubmit(result);
+    } catch(e) {
+      console.error(e);
+      setIsSubmitting(false);
+    }
   };
 
-  const handleNext = () => {
-    // Move to next question or finish
-    setCurrentQuestion(prev => prev + 1);
-    setSelectedAnswer('');
-    setTimeLeft(25);
+  const formatTime = (seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="bg-background border-b px-4 py-3 flex items-center justify-between sticky top-0 z-30">
-        <button onClick={onBack} className="flex items-center space-x-2">
-          <ArrowLeft className="w-5 h-5" />
-          <span>কেন কিভাবে পরীক্ষা দিতে চাও?</span>
-        </button>
-        <span className="text-sm text-green-600">৩৮ জন অনলাইন</span>
-      </div>
-
-      <div className="p-4 max-w-md mx-auto space-y-6">
-        {/* Progress Bar */}
-        <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-          <div className="bg-green-500 h-2 rounded-full" style={{ width: '10%' }}></div>
-        </div>
-
-        {/* Question */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl p-4 shadow-sm">
-          <h2 className="text-lg font-semibold mb-4">{question.text}</h2>
-          
-          {/* Options */}
-          <div className="space-y-3">
-            {question.options.map((option, index) => (
-              <label key={index} className="flex items-center space-x-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="answer"
-                  value={option}
-                  checked={selectedAnswer === option}
-                  onChange={(e) => setSelectedAnswer(e.target.value)}
-                  className="w-4 h-4 text-green-600"
-                />
-                <span className="text-sm">{option}</span>
-                {option.includes('৩৯৯') && (
-                  <span className="text-xs text-gray-500 ml-auto">৩৯৯ টি প্রশ্ন</span>
-                )}
-              </label>
-            ))}
+    <div className="min-h-screen bg-background p-4 md:p-6">
+      <div className="max-w-4xl mx-auto">
+        <header className="sticky top-0 bg-background/80 backdrop-blur-sm z-10 py-4 mb-6">
+          {/* Mobile-responsive header */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <h1 className="text-xl md:text-2xl font-bold text-center sm:text-left">Mock Exam In Progress</h1>
+            <div className={`flex items-center space-x-2 px-3 py-1.5 rounded-full text-lg font-mono ${timeLeft < 60 ? 'bg-red-100 text-red-700' : 'bg-muted'}`}>
+              <Clock className="w-5 h-5" />
+              <span>{formatTime(timeLeft)}</span>
+            </div>
           </div>
+        </header>
+
+        <div className="space-y-6">
+          {questions.map((q, index) => (
+            <Card key={q._id}>
+              <CardContent className="p-4 md:p-6">
+                <div className="font-semibold mb-4 text-base leading-relaxed">
+                  {index + 1}. <MathRenderer text={q.text} />
+                </div>
+                 {q.image && <img src={q.image} alt={`Question ${index+1}`} className="my-4 rounded-md max-w-full h-auto" />}
+                <RadioGroup onValueChange={(val) => handleAnswerChange(q._id, parseInt(val, 10))}>
+                  {q.options.map((option, i) => (
+                    <div key={option._id} className="flex items-start space-x-3 p-2">
+                      <RadioGroupItem value={i.toString()} id={`${q._id}-${i}`} className="mt-1" />
+                      <Label htmlFor={`${q._id}-${i}`} className="flex-1 cursor-pointer mt-2">
+                        <MathRenderer text={option.text} />
+                        {option.image && <img src={option.image} alt={`Option ${i+1}`} className="mt-2 rounded-md max-w-xs h-auto" />}
+                      </Label>
+                    </div>
+                  ))}
+                </RadioGroup>
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
-        {/* Timer */}
-        <div className="flex items-center justify-center space-x-2 text-sm">
-          <Clock className="w-4 h-4" />
-          <span>প্রয় সময়ঃ</span>
-          <span className="font-mono bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">
-            {timeLeft}
-          </span>
+        {/* --- Mobile Floating Submit Button --- */}
+        <div className="md:hidden fixed bottom-4 right-4 z-20">
+            <Button size="lg" onClick={() => setIsAlertOpen(true)} disabled={isSubmitting} className="rounded-full shadow-lg h-14 w-32">
+              {isSubmitting ? '...' : 'Submit'}
+            </Button>
         </div>
 
-        {/* Action Buttons */}
-        <div className="flex space-x-3">
-          <button className="flex-1 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 py-3 rounded-lg font-medium">
-            প্রশ্নটি রিভিউ করো রাখুন
-          </button>
-          <button 
-            onClick={selectedAnswer ? handleNext : handleSubmit}
-            disabled={!selectedAnswer}
-            className="flex-1 bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white py-3 rounded-lg font-medium transition-colors"
-          >
-            পরবর্তী প্রশ্ন
-          </button>
-        </div>
+        {/* --- Desktop Submit Button --- */}
+        <footer className="mt-8 hidden md:flex justify-end">
+          <Button size="lg" onClick={() => setIsAlertOpen(true)} disabled={isSubmitting}>
+            {isSubmitting ? 'Submitting...' : 'Submit Exam'}
+          </Button>
+        </footer>
+
+        {/* --- Shared Alert Dialog --- */}
+        <AlertDialog open={isAlertOpen} onOpenChange={setIsAlertOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you sure you want to submit?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Your exam will be graded immediately. You cannot change your answers after this.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleSubmit}>Yes, Submit</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
       </div>
     </div>
   );

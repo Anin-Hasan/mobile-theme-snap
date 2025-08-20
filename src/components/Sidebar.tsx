@@ -13,7 +13,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onClose, currentPage, 
   const menuItems = [
     { id: 'dashboard', label: 'ড্যাশবোর্ড', icon: Home },
     { id: 'book-review', label: 'বই পর্যালোচনা', icon: BookOpen },
-    { id: 'brand-promotion', label: 'ব্র্যান্ড প্রমোশন', icon: Zap },
+    { id: 'mock-exam', label: 'মক পরীক্ষা', icon: Zap },
     { id: 'chatbot', label: 'চ্যাটবট', icon: MessageSquare },
     { id: 'job-prep', label: 'চাকরি', icon: Award },
     { id: 'exam', label: 'পরীক্ষা', icon: BarChart3 },
