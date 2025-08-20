@@ -169,3 +169,31 @@
     transform: translateX(0);
   }
 }
+
+@keyframes reveal-in {
+  from {
+    clip-path: circle(0% at var(--x) var(--y));
+  }
+  to {
+    clip-path: circle(150% at var(--x) var(--y));
+  }
+}
+
+/* 
+  Style the pseudo-element that represents the NEW state (the page we're transitioning TO).
+  We override the default cross-fade and apply our custom 'reveal-in' animation.
+*/
+::view-transition-new(root) {
+  animation: reveal-in 0.6s ease-in-out;
+  /* Mix-blend-mode is used to ensure text remains visible during the transition */
+  mix-blend-mode: normal; 
+}
+
+/* 
+  Style the pseudo-element for the OLD state (the page we're transitioning FROM).
+  We disable its animation so it disappears instantly underneath the new state.
+*/
+::view-transition-old(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}

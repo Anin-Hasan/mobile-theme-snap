@@ -1,11 +1,11 @@
-
 import React from 'react';
 import { Menu, Sun, Moon, Bell, User } from 'lucide-react';
 
 interface HeaderProps {
   onMenuClick: () => void;
   isDark: boolean;
-  onThemeToggle: () => void;
+  // We now pass the entire MouseEvent to the handler
+  onThemeToggle: (event: React.MouseEvent<HTMLButtonElement>) => void;
   user?: {
     name: string;
     batch: string;
@@ -29,6 +29,7 @@ export const Header: React.FC<HeaderProps> = ({ onMenuClick, isDark, onThemeTogg
       </div>
 
       <div className="flex items-center space-x-3">
+        {/* The onClick now passes the event to the onThemeToggle function */}
         <button onClick={onThemeToggle} className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
           {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
         </button>

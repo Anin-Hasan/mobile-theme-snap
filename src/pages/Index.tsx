@@ -9,12 +9,17 @@ import { Quiz } from '../components/Quiz';
 import { MockExamResult } from '../components/MockExamResult';
 import * as api from '../api/user';
 
+// --- THIS IS THE FIX ---
+// The return type is now correctly set to ViewTransition, which is a globally available type in modern browsers/TS.
+interface DocumentWithViewTransition extends Document {
+  startViewTransition?: (updateCallback: () => Promise<void> | void) => ViewTransition;
+}
 
 const Index = () => {
   const [currentPage, setCurrentPage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isDark, setIsDark] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(true); // Set to true for dev, false for prod
+  const [isLoggedIn, setIsLoggedIn] = useState(true);
 
   // State for the mock exam flow
   const [examQuestions, setExamQuestions] = useState<api.Question[]>([]);
@@ -31,15 +36,35 @@ const Index = () => {
     const savedTheme = localStorage.getItem('theme');
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const shouldUseDark = savedTheme === 'dark' || (!savedTheme && prefersDark);
+    
     setIsDark(shouldUseDark);
     document.documentElement.classList.toggle('dark', shouldUseDark);
   }, []);
 
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    localStorage.setItem('theme', newTheme ? 'dark' : 'light');
-    document.documentElement.classList.toggle('dark', newTheme);
+  const toggleTheme = (event: React.MouseEvent<HTMLButtonElement>) => {
+    const doc = document as DocumentWithViewTransition;
+    if (!doc.startViewTransition) {
+      // Fallback for older browsers
+      const newTheme = !isDark;
+      setIsDark(newTheme);
+      localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', newTheme);
+      return;
+    }
+
+    const x = event.clientX;
+    const y = event.clientY;
+
+    document.documentElement.style.setProperty('--x', `${x}px`);
+    document.documentElement.style.setProperty('--y', `${y}px`);
+
+    // Start the transition
+    doc.startViewTransition(() => {
+      const newTheme = !isDark;
+      setIsDark(newTheme);
+      localStorage.setItem('theme', newTheme ? 'dark' : 'light');
+      document.documentElement.classList.toggle('dark', newTheme);
+    });
   };
   
   const resetExamState = () => {
@@ -78,14 +103,12 @@ const Index = () => {
     switch (currentPage) {
       case 'dashboard':
         return <Dashboard onNavigate={handleNavigate} />;
-      // The "mock-exam" value is used by Dashboard/Sidebar buttons
       case 'mock-exam':
         return <ExamSelection onBack={() => handleNavigate('dashboard')} onStartExam={handleStartExam} />;
       case 'quiz':
         if (examQuestions.length > 0 && examOptions) {
           return <Quiz questions={examQuestions} options={examOptions} onSubmit={handleSubmitExam} onBack={() => handleNavigate('mock-exam')} />;
         }
-        // Fallback if state is lost (e.g., page refresh)
         handleNavigate('dashboard');
         return null;
       case 'exam-result':
@@ -97,8 +120,6 @@ const Index = () => {
       case 'profile':
         return <Profile user={mockUser} />;
       default:
-        // Handle cases like 'book-review', 'chatbot' from sidebar
-        // For now, they all go to the dashboard.
         return <Dashboard onNavigate={handleNavigate} />;
     }
   };
